@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.MonCacheType">
+<Abstract>1</Abstract>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63875,70599.733152</TimeCreated>
+
+<Parameter name="TypeNull">
+<Default>null</Default>
+</Parameter>
+
+<Parameter name="TypeBoolean">
+<Default>boolean</Default>
+</Parameter>
+
+<Parameter name="TypeNumber">
+<Default>number</Default>
+</Parameter>
+
+<Parameter name="TypeString">
+<Default>string</Default>
+</Parameter>
+
+<Parameter name="TypeObjectId">
+<Default>objectid</Default>
+</Parameter>
+
+<Parameter name="TypeArray">
+<Default>array</Default>
+</Parameter>
+
+<Parameter name="TypeObject">
+<Default>object</Default>
+</Parameter>
+
+<Method name="isNull">
+<Implementation><![CDATA[    return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isBoolean">
+<Implementation><![CDATA[    return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isNumber">
+<Implementation><![CDATA[    return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isString">
+<Implementation><![CDATA[        return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isObjectId">
+<Implementation><![CDATA[        return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isArray">
+<Implementation><![CDATA[        return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isObject">
+<Implementation><![CDATA[        return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<Abstract>1</Abstract>
+<FormalSpec>node:%String</FormalSpec>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    set type = $get(@$name(@node@("t")))
+
+    if (type = ..#TypeNull) {
+        return ##class(Null).fromGlobal(node)
+    }
+
+    if (type = ..#TypeBoolean) {
+        return ##class(Boolean).fromGlobal(node)
+    }
+
+    if (type = ..#TypeNumber) {
+        return ##class(Number).fromGlobal(node)
+    }
+
+    if (type = ..#TypeString) {
+        return ##class(String).fromGlobal(node)
+    }
+
+    if (type = ..#TypeObjectId) {
+        return ##class(ObjectId).fromGlobal(node)
+    }
+
+    if (type = ..#TypeArray) {
+        return ##class(Array).fromGlobal(node)
+    }
+
+    if (type = ..#TypeObject) {
+        return ##class(Object).fromGlobal(node)
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<Abstract>1</Abstract>
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+</Method>
+
+<Method name="notEquals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..equals(value)
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<Abstract>1</Abstract>
+<ReturnType>%String</ReturnType>
+</Method>
+</Class>
+</Export>

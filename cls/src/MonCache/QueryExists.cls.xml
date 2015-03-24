@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.QueryExists">
+<IncludeCode>MonCache,MonCache.Utils</IncludeCode>
+<Super>MonCache.Query</Super>
+<TimeCreated>63875,70599.390266</TimeCreated>
+
+<Property name="name">
+<Type>%String</Type>
+<Private>1</Private>
+</Property>
+
+<Property name="value">
+<Type>MonCache.Types.Boolean</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>name:%String,value:MonCache.Types.Boolean</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+  s ..name = name
+
+  s ..value = value
+
+  return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return "{"""_(..name)_""": {$exists: "_(..value.toString())_"}}"
+]]></Implementation>
+</Method>
+
+<Method name="isSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+  s path = ..name
+
+  s pathItems = $listfromstring(path, ".")
+
+  s pathItemsCount = $listlength(pathItems)
+
+  s objectIterator = object
+
+  for i = 1:1:pathItemsCount {
+    s pathItem = $list(pathItems, i)
+
+    if (objectIterator.isObject()) {
+      s fieldName = pathItem
+
+      s hasNoField = objectIterator.notContains(fieldName)
+
+      if (hasNoField) {
+        return ..value.equals($$$false)
+      }
+
+      s objectIterator = objectIterator.get(fieldName)
+    }
+    elseif (objectIterator.isArray()) {
+      if ($$$numbers.isNotValidNumber(pathItem)) {
+        return ..value.equals($$$false)
+      }
+
+      set index = $$$numbers.toNumber(pathItem)
+
+      set hasNoItem = objectIterator.notContains(index)
+
+      if (hasNoItem) {
+        return ..value.equals($$$false)
+      }
+
+      set objectIterator = objectIterator.get(index)
+    } else {
+      return $$$NO
+    }
+  }
+
+  return ..value.equals($$$true)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

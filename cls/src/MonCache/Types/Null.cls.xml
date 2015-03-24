@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.Null">
+<IncludeCode>MonCache</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.772528</TimeCreated>
+
+<Method name="isNull">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[    set @node@("t") = ##class(MonCacheType).#TypeNull
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeNull) {
+        return $$$null
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return $classname($this) = $classname(value)
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return "null"
+]]></Implementation>
+</Method>
+
+<Method name="getInstance">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    if ('$data(%NullInstance) || '$isobject(%NullInstance)) {
+        set %NullInstance = ..%New()
+    }
+
+    return %NullInstance
+]]></Implementation>
+</Method>
+</Class>
+</Export>

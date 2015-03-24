@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.Boolean">
+<IncludeCode>MonCache</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.68841</TimeCreated>
+
+<Property name="value">
+<Type>%Boolean</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>value:%Boolean</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+    set ..value = $case(value, 0:0, :1)
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="isBoolean">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="getValue">
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return ..value
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeBoolean
+
+    if (..value) {
+        set @node@("v") = "true"
+    } else {
+        set @node@("v") = "false"
+    }
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeBoolean) {
+        if ($get(@node@("v")) = "true") {
+            return $$$true
+        }
+        elseif ($get(@node@("v")) = "false") {
+            return $$$false
+        }
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    return ..value = ##class(Boolean) value.getValue()
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    if (..value) {
+        return "true"
+    } else {
+        return "false"
+    }
+]]></Implementation>
+</Method>
+
+<Method name="getTrueInstance">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    if ('$data(%TrueInstance) || '$isobject(%TrueInstance)) {
+        set %TrueInstance = ..%New($$$YES)
+    }
+
+    return %TrueInstance
+]]></Implementation>
+</Method>
+
+<Method name="getFalseInstance">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    if ('$data(%FalseInstance) || '$isobject(%FalseInstance)) {
+        set %FalseInstance = ..%New($$$NO)
+    }
+
+    return %FalseInstance
+]]></Implementation>
+</Method>
+</Class>
+</Export>

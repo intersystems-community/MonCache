@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.ObjectId">
+<IncludeCode>MonCache,MonCache.Utils</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.858428</TimeCreated>
+
+<Property name="timestamp">
+<Type>%Integer</Type>
+<Private>1</Private>
+<Required>1</Required>
+</Property>
+
+<Property name="machineIdentifier">
+<Type>%Integer</Type>
+<Private>1</Private>
+<Required>1</Required>
+</Property>
+
+<Property name="processIdentifier">
+<Type>%Integer</Type>
+<Private>1</Private>
+<Required>1</Required>
+</Property>
+
+<Property name="id">
+<Type>%Integer</Type>
+<Private>1</Private>
+<Required>1</Required>
+</Property>
+
+<Property name="hex">
+<Type>%String</Type>
+<Private>1</Private>
+<Required>1</Required>
+<Parameter name="MAXLEN" value="24"/>
+<Parameter name="MINLEN" value="24"/>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>hex:%String=""</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+    if ($length(hex) = 0) {
+        set ..timestamp = ..calculateTimestamp()
+
+        set ..machineIdentifier = ..calculateMachineIdentifier()
+
+        set ..processIdentifier = ..calculateProcessIdentifier()
+
+        set ..id = ..calculateId()
+
+        set ..hex = ..calculateHex()
+    } else {
+        set byte01 = $zhex($extract(hex, 1, 2))
+        set byte02 = $zhex($extract(hex, 3, 4))
+        set byte03 = $zhex($extract(hex, 5, 6))
+        set byte04 = $zhex($extract(hex, 7, 8))
+
+        set ..timestamp = $$$bytes.integerFrom4bytes(byte01, byte02, byte03, byte04)
+
+        set byte05 = $zhex($extract(hex, 9, 10))
+        set byte06 = $zhex($extract(hex, 11, 12))
+        set byte07 = $zhex($extract(hex, 13, 14))
+
+        set ..machineIdentifier = $$$bytes.integerFrom3bytes(byte05, byte06, byte07)
+
+        set byte08 = $zhex($extract(hex, 15, 16))
+        set byte09 = $zhex($extract(hex, 17, 18))
+
+        set ..processIdentifier = $$$bytes.integerFrom2bytes(byte08, byte09)
+
+        set byte10 = $zhex($extract(hex, 19, 20))
+        set byte11 = $zhex($extract(hex, 21, 22))
+        set byte12 = $zhex($extract(hex, 23, 24))
+
+        set ..id = $$$bytes.integerFrom3bytes(byte10, byte11, byte12)
+
+        set ..hex = hex
+    }
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="isObjectId">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="calculateTimestamp">
+<Private>1</Private>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+    set timestampSeconds = $ztimestamp
+
+    set timestampMilliseconds = +$piece(($piece(timestampSeconds,",")-47117)*86400 + $piece(timestampSeconds,",",2) * 1000, ".")
+
+    return $$$bytes.normTo4bytes(timestampMilliseconds)
+]]></Implementation>
+</Method>
+
+<Method name="getTimestamp">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..timestamp
+]]></Implementation>
+</Method>
+
+<Method name="calculateMachineIdentifier">
+<Private>1</Private>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+    set machineIdentifierHash = $system.Encryption.MD5Hash($system)
+
+    set byte1 = $$$bytes.normTo1byte($ascii(machineIdentifierHash, 1))
+
+    set byte2 = $$$bytes.normTo1byte($ascii(machineIdentifierHash, 2))
+
+    set byte3 = $$$bytes.normTo1byte($ascii(machineIdentifierHash, 3))
+
+    set machineIdentifier = $$$bytes.integerFrom3bytes(byte1, byte2, byte3)
+
+    return $$$bytes.normTo3bytes(machineIdentifier)
+]]></Implementation>
+</Method>
+
+<Method name="getMachineIdentifier">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..machineIdentifier
+]]></Implementation>
+</Method>
+
+<Method name="calculateProcessIdentifier">
+<Private>1</Private>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+    set processIdentifier = +$JOB
+
+    return $$$bytes.normTo2bytes(processIdentifier)
+]]></Implementation>
+</Method>
+
+<Method name="getProcessIdentifier">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..processIdentifier
+]]></Implementation>
+</Method>
+
+<Method name="calculateId">
+<Private>1</Private>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+    if ('$data(%ObjectIdCounter)) {
+        set %ObjectIdCounter = $RANDOM(##class(MonCache.Utils.Bytes).#FourBytesNumber)
+    }
+
+    set id = $increment(%ObjectIdCounter)
+
+    return $$$bytes.normTo3bytes(id)
+]]></Implementation>
+</Method>
+
+<Method name="getId">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..id
+]]></Implementation>
+</Method>
+
+<Method name="calculateHex">
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    set byte01 = $$$bytes.byte4(..timestamp)
+    set byte02 = $$$bytes.byte3(..timestamp)
+    set byte03 = $$$bytes.byte2(..timestamp)
+    set byte04 = $$$bytes.byte1(..timestamp)
+
+    set byte05 = $$$bytes.byte3(..machineIdentifier)
+    set byte06 = $$$bytes.byte2(..machineIdentifier)
+    set byte07 = $$$bytes.byte1(..machineIdentifier)
+
+    set byte08 = $$$bytes.byte2(..processIdentifier)
+    set byte09 = $$$bytes.byte1(..processIdentifier)
+
+    set byte10 = $$$bytes.byte3(..id)
+    set byte11 = $$$bytes.byte2(..id)
+    set byte12 = $$$bytes.byte1(..id)
+
+    set hex = ""
+
+    set hex = hex_$translate($justify($zhex(byte01), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte02), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte03), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte04), 2), " ", "0")
+
+    set hex = hex_$translate($justify($zhex(byte05), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte06), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte07), 2), " ", "0")
+
+    set hex = hex_$translate($justify($zhex(byte08), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte09), 2), " ", "0")
+
+    set hex = hex_$translate($justify($zhex(byte10), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte11), 2), " ", "0")
+    set hex = hex_$translate($justify($zhex(byte12), 2), " ", "0")
+
+    return $$$strings.toLowerCase(hex)
+]]></Implementation>
+</Method>
+
+<Method name="getHex">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return ..hex
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeObjectId
+    set @node@("v") = ..hex
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeObjectId) {
+        return $$$objectId($get(@node@("v")))
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    if (..hex '= ##class(ObjectId) value.getHex()) {
+        return $$$NO
+    }
+
+    if (..timestamp '= ##class(ObjectId) value.getTimestamp()) {
+        return $$$NO
+    }
+
+    if (..machineIdentifier '= ##class(ObjectId) value.getMachineIdentifier()) {
+        return $$$NO
+    }
+
+    if (..processIdentifier '= ##class(ObjectId) value.getProcessIdentifier()) {
+        return $$$NO
+    }
+
+    if (..processIdentifier '= ##class(ObjectId) value.getProcessIdentifier()) {
+        return $$$NO
+    }
+
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return "ObjectId("""_(..hex)_""")"
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.Object">
+<IncludeCode>MonCache,MonCache.Utils</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.905111</TimeCreated>
+
+<Property name="fields">
+<Type>MonCacheType</Type>
+<Collection>array</Collection>
+</Property>
+
+<Method name="isObject">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="setNull">
+<FormalSpec>name:%String</FormalSpec>
+<Implementation><![CDATA[    do ..set(name, $$$null)
+]]></Implementation>
+</Method>
+
+<Method name="setBoolean">
+<FormalSpec>name:%String,value:%Boolean</FormalSpec>
+<Implementation><![CDATA[    do ..set(name, $$$boolean(value))
+]]></Implementation>
+</Method>
+
+<Method name="setString">
+<FormalSpec>name:%String,value:%String</FormalSpec>
+<Implementation><![CDATA[    do ..set(name, $$$string(value))
+]]></Implementation>
+</Method>
+
+<Method name="setNumber">
+<FormalSpec>name:%String,value:%Numeric</FormalSpec>
+<Implementation><![CDATA[    do ..set(name, $$$number(value))
+]]></Implementation>
+</Method>
+
+<Method name="setList">
+<FormalSpec>name:%String,list:%Library.ListOfDataTypes</FormalSpec>
+<Implementation><![CDATA[
+    set array = $$$array
+
+    set i = list.Next("")
+
+    while (i '= "") {
+        set value = list.GetAt(i)
+
+        if (value.%IsA("MonCache.Types.MonCacheType")) {
+            do array.add(value)
+        }
+
+        set i = list.Next(i)
+    }
+
+    do ..set(name, array)
+]]></Implementation>
+</Method>
+
+<Method name="set">
+<FormalSpec>name:%String,value:MonCacheType</FormalSpec>
+<Implementation><![CDATA[
+    if ($this = value) {
+        do ..fields.SetAt(value.%ConstructClone($$$YES), name)
+    } else {
+        do ..fields.SetAt(value, name)
+    }
+]]></Implementation>
+</Method>
+
+<Method name="contains">
+<FormalSpec>name:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return ..fields.IsDefined(name)
+]]></Implementation>
+</Method>
+
+<Method name="notContains">
+<FormalSpec>name:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..contains(name)
+]]></Implementation>
+</Method>
+
+<Method name="get">
+<FormalSpec>name:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[    return ..fields.GetAt(name)
+]]></Implementation>
+</Method>
+
+<Method name="getNames">
+<ReturnType>%Library.ListOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+    set names = $$$collections.newList()
+
+    set name = ..fields.Next("")
+
+    while (name '= "") {
+        do names.Insert(name)
+
+        set name = ..fields.Next(name)
+    }
+
+    return names
+]]></Implementation>
+</Method>
+
+<Method name="size">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..fields.Count()
+]]></Implementation>
+</Method>
+
+<Method name="isEmpty">
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return ..size() = 0
+]]></Implementation>
+</Method>
+
+<Method name="isNotEmpty">
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..isEmpty()
+]]></Implementation>
+</Method>
+
+<Method name="remove">
+<FormalSpec>name:%String</FormalSpec>
+<Implementation><![CDATA[    do ..fields.RemoveAt(name)
+]]></Implementation>
+</Method>
+
+<Method name="clear">
+<Implementation><![CDATA[    do ..fields.Clear()
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeObject
+
+    set name = ..fields.Next("")
+
+    while (name '= "") {
+        set value = ..get(name)
+
+        do value.toGlobal($name(@node@("v", name)))
+
+        set name = ..fields.Next(name)
+    }
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    set object = $$$object
+
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeObject) {
+        set fieldName = $order(@node@("v", ""))
+
+        while (fieldName '= "") {
+            set fieldNode = $name(@node@("v", fieldName))
+
+            set fieldValue = ##class(MonCacheType).fromGlobal(fieldNode)
+
+            if (fieldValue '= "") {
+                do object.set(fieldName, fieldValue)
+            }
+
+            set fieldName = $order(@fieldNode)
+        }
+
+        return object
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    if (..size() '= ##class(Object) value.size()) {
+        return $$$NO
+    }
+
+    set name = ""
+
+    while (name '= "") {
+        if ('##class(Object) value.has(name)) {
+            return $$$NO
+        }
+
+        set value = ..get(name)
+
+        set objectValue = ##class(Object) value.get(name)
+
+        if (value.notEquals(objectValue)) {
+            return $$$NO
+        }
+    }
+
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    set string = ""
+
+    set name = ..fields.Next("")
+
+    while (name '= "") {
+        set value = ..get(name)
+
+        set string = string_$select($$$strings.isEmpty(string): "", 1: ",")_""""_name_""":"_(value.toString())
+
+        set name = ..fields.Next(name)
+    }
+
+    return "{"_string_"}"
+]]></Implementation>
+</Method>
+</Class>
+</Export>

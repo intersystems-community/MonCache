@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Utils.Numbers">
+<Abstract>1</Abstract>
+<TimeCreated>63875,70600.048047</TimeCreated>
+
+<Method name="isValidNumber">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>nuberString:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return $isvalidnum(numberString)
+]]></Implementation>
+</Method>
+
+<Method name="isNotValidNumber">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>nuberString:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..isValidNumber(numberString)
+]]></Implementation>
+</Method>
+
+<Method name="toNumber">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>numberString:%String</FormalSpec>
+<ReturnType>%Numeric</ReturnType>
+<Implementation><![CDATA[    return +numberString
+]]></Implementation>
+</Method>
+</Class>
+</Export>

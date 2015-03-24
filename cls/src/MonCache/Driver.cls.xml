@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Driver">
+<IncludeCode>MonCache</IncludeCode>
+<TimeCreated>63875,70599.048357</TimeCreated>
+
+<Method name="insert">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,documentInfo:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s document = ..decode(documentInfo)
+
+    s result = ##class(DB).insert(dbName, collectionName, document)
+
+    s okResponse = $$$object
+    d okResponse.set("data", ..convertResult(result))
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""insert"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="save">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,documentInfo:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s document = ..decode(documentInfo)
+
+    s result = ##class(DB).save(dbName, collectionName, document)
+
+    s okResponse = $$$object
+    d okResponse.set("data", ..convertResult(result))
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""save"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="count">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,queryInfo:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    set query = ..decode(queryInfo)
+
+    s documentsCount = ##class(DB).count(dbName, collectionName, query)
+
+    s data = $$$object
+    d data.setNumber("count", documentsCount)
+
+    s okResponse = $$$object
+    d okResponse.set("data", data)
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""count"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="find">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,queryInfo:%String="",projectionInfo:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s query = ..decode(queryInfo)
+
+    s projection = ..decode(projectionInfo)
+
+    s documents = ##class(DB).find(dbName, collectionName, query, projection)
+
+    s okResponse = $$$object
+    d okResponse.setList("data", documents)
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""find"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="findOne">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,queryInfo:%String="",projectionInfo:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s query = ..decode(queryInfo)
+
+    s projection = ..decode(projectionInfo)
+
+    s document = ##class(DB).findOne(dbName, collectionName, query, projection)
+
+    if (document '= "") {
+      s okResponse = $$$object
+      d okResponse.set("data", document)
+
+      return ..encode(okResponse)
+    } else {
+      s okResponse = $$$object
+      d okResponse.setNull("data")
+
+      return ..encode(okResponse)
+    }
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""findOne"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="update">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,queryInfo:%String,modificationsInfo:%String,parametersInfo:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s query = ..decode(queryInfo)
+
+    s modifications = ..decode(modificationsInfo)
+
+    s parameters = ..decode(parametersInfo)
+
+    s result = ##class(DB).update(dbName, collectionName, query, modifications, parameters)
+
+    s okResponse = $$$object
+    d okResponse.set("data", ..convertResult(result))
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""update"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="remove">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,collectionName:%String,queryInfo:%String="",parametersInfo:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  Try {
+    s query = ..decode(queryInfo)
+
+    s parameters = ..decode(parametersInfo)
+
+    s result = ##class(DB).remove(dbName, collectionName, query, parameters)
+
+    s okResponse = $$$object
+    d okResponse.set("data", ..convertResult(result))
+
+    return ..encode(okResponse)
+  }
+  Catch e {
+    s errorResponse = $$$object
+    d errorResponse.setString("error", "Command ""remove"" failed")
+
+    return ..encode(errorResponse)
+  }
+]]></Implementation>
+</Method>
+
+<Method name="encode">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.Format.Formatter).toString(data)
+]]></Implementation>
+</Method>
+
+<Method name="decode">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.Format.Formatter).fromString(data)
+]]></Implementation>
+</Method>
+
+<Method name="convertResult">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>result:MonCache.DB.Result</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Object</ReturnType>
+<Implementation><![CDATA[
+  s json = ##class(MonCache.Types.Object).%New()
+  d json.setNumber("nInserted", result.nInserted)
+  d json.setNumber("nModified", result.nModified)
+  d json.setNumber("nRemoved",  result.nRemoved)
+
+  return json
+]]></Implementation>
+</Method>
+</Class>
+</Export>

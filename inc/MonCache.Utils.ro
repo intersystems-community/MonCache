@@ -1,0 +1,13 @@
+Cache for UNIX^INC^routine output by %apiRTN^^~Format=Cache.S~^UTF8
+%RO on 06 Sep 2015 11:08:22AM
+MonCache.Utils^INC^^63685,83264^0
+#define bytes         ##class(MonCache.Utils.Bytes)
+.
+#define strings       ##class(MonCache.Utils.Strings)
+.
+#define numbers       ##class(MonCache.Utils.Numbers)
+.
+#define collections   ##class(MonCache.Utils.Collections)
+
+
+

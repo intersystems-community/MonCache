@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.ObjectIdTests">
+<IncludeCode>MonCache</IncludeCode>
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63876,59046.045868</TimeCreated>
+
+<Property name="objectId">
+<Type>MonCache.Types.ObjectId</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="OnBeforeAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set ..objectId = $$$objectId("55163fa666051c6854beb38d")
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="TestTypePredicats">
+<Implementation><![CDATA[
+    do $$$AssertEquals($$$NO, ..objectId.isNull(), "(1 / 7) is not Null")
+
+    do $$$AssertEquals($$$NO, ..objectId.isBoolean(), "(2 / 7) is not Boolean")
+
+    do $$$AssertEquals($$$NO, ..objectId.isNumber(), "(3 / 7) is not Number")
+
+    do $$$AssertEquals($$$NO, ..objectId.isString(), "(4 / 7) is not String")
+
+    do $$$AssertEquals($$$YES, ..objectId.isObjectId(), "(5 / 7) is ObjectId")
+
+    do $$$AssertEquals($$$NO, ..objectId.isArray(), "(6 / 7) is not Array")
+
+    do $$$AssertEquals($$$NO, ..objectId.isObject(), "(7 / 7) is not Object")
+]]></Implementation>
+</Method>
+
+<Method name="TestJsonLikePresentation">
+<Implementation><![CDATA[
+    set expectedString = "ObjectId(""55163fa666051c6854beb38d"")"
+
+    set actualString = ..objectId.toString()
+
+    do $$$AssertEquals(expectedString, actualString, expectedString)
+]]></Implementation>
+</Method>
+
+<Method name="TestGlobalBasedPresentation">
+<Implementation><![CDATA[
+    set expectedPresentation("field", "t") = "objectid"
+    set expectedPresentation("field", "v") = ..objectId.getHex()
+
+
+    set actualPresentation = $name(^MonCacheTests("Types.ObjectIdTests", "TestGlobalBasedPresentation"))
+
+    kill @actualPresentation
+
+    do ..objectId.toGlobal($name(@actualPresentation@("field")))
+
+
+    do $$$AssertEquals($data(expectedPresentation("field")), $data(@actualPresentation@("field")), "(1 / 3) Comparing structure.")
+    do $$$AssertEquals($data(expectedPresentation("field", "t")), $data(@actualPresentation@("field", "t")), "(2 / 3) Comparing structure.")
+    do $$$AssertEquals($data(expectedPresentation("field", "v")), $data(@actualPresentation@("field", "v")), "(3 / 3) Comparing structure.")
+
+    do $$$AssertEquals($get(expectedPresentation("field")), $get(@actualPresentation@("field")), "(1 / 3) Comparing data.")
+    do $$$AssertEquals($get(expectedPresentation("field", "t")), $get(@actualPresentation@("field", "t")), "(2 / 3) Comparing data.")
+    do $$$AssertEquals($get(expectedPresentation("field", "v")), $get(@actualPresentation@("field", "v")), "(3 / 3) Comparing data.")
+]]></Implementation>
+</Method>
+
+<Method name="TestObjectIdCreation">
+<Implementation><![CDATA[
+    set expectedObjectId = $$$objectId()
+
+    set actualObjectId = $$$objectId(expectedObjectId.getHex())
+
+    do $$$AssertEquals(expectedObjectId.getHex(), actualObjectId.getHex(), "(1 / 5) Comparing hex.")
+
+    do $$$AssertEquals(expectedObjectId.getTimestamp(), actualObjectId.getTimestamp(), "(2 / 5) Comparing timestamp.")
+
+    do $$$AssertEquals(expectedObjectId.getMachineIdentifier(), actualObjectId.getMachineIdentifier(), "(3 / 5) Comparing machine identifier.")
+
+    do $$$AssertEquals(expectedObjectId.getProcessIdentifier(), actualObjectId.getProcessIdentifier(), "(4 / 5) Comparing process identifier.")
+
+    do $$$AssertEquals(expectedObjectId.getId(), actualObjectId.getId(), "(5 / 5) Comparing id.")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

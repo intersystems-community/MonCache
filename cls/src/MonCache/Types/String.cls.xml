@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.String">
+<IncludeCode>MonCache</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.946102</TimeCreated>
+
+<Property name="value">
+<Type>%String</Type>
+<Private>1</Private>
+<Parameter name="TRUNCATE" value="0"/>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>value:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+    set ..value = value
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="isString">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="getValue">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return ..value
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeString
+    set @node@("v") = ..value
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeString) {
+        return $$$string($get(@node@("v")))
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    return ..value = ##class(String) value.getValue()
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return """"_$zconvert(..value, "O", "JS")_""""
+]]></Implementation>
+</Method>
+</Class>
+</Export>

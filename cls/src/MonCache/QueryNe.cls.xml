@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.QueryNe">
+<Super>Query</Super>
+<TimeCreated>63875,70599.500017</TimeCreated>
+
+<Property name="name">
+<Type>%String</Type>
+<Private>1</Private>
+</Property>
+
+<Property name="value">
+<Type>MonCache.Types.MonCacheType</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>name:%String,value:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+  s ..name = name
+
+  s ..value = value
+
+  return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return "{"""_(..name)_""": {$ne: "_(..value.toString())_"}}"
+]]></Implementation>
+</Method>
+
+<Method name="isSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '##class(MonCache.QueryEquals).%New(..name, ..value).isSatisfied(object)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

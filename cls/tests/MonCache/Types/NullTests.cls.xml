@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.NullTests">
+<IncludeCode>MonCache</IncludeCode>
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63876,59045.921228</TimeCreated>
+
+<Method name="TestTypePredicats">
+<Implementation><![CDATA[
+    do $$$AssertEquals($$$YES, $$$null.isNull(), "(1 / 7) is Null")
+
+    do $$$AssertEquals($$$NO, $$$null.isBoolean(), "(2 / 7) is not Boolean")
+
+    do $$$AssertEquals($$$NO, $$$null.isNumber(), "(3 / 7) is not Number")
+
+    do $$$AssertEquals($$$NO, $$$null.isString(), "(4 / 7) is not String")
+
+    do $$$AssertEquals($$$NO, $$$null.isObjectId(), "(5 / 7) is not ObjectId")
+
+    do $$$AssertEquals($$$NO, $$$null.isArray(), "(6 / 7) is not Array")
+
+    do $$$AssertEquals($$$NO, $$$null.isObject(), "(7 / 7) is not Object")
+]]></Implementation>
+</Method>
+
+<Method name="TestJsonLikePresentation">
+<Implementation><![CDATA[
+    set expectedString = "null"
+
+    set actualString = $$$null.toString()
+
+    do $$$AssertEquals(expectedString, actualString, expectedString)
+]]></Implementation>
+</Method>
+
+<Method name="TestGlobalBasedPresentation">
+<Implementation><![CDATA[
+    set expectedPresentation("field", "t") = "null"
+
+
+    set actualPresentation = $name(^MonCacheTests("Types.NullTests", "TestGlobalBasedPresentation"))
+
+    kill @actualPresentation
+
+    do $$$null.toGlobal($name(@actualPresentation@("field")))
+
+
+    do $$$AssertEquals($data(expectedPresentation("field")), $data(@actualPresentation@("field")), "(1 / 2) Comparing structure.")
+    do $$$AssertEquals($data(expectedPresentation("field", "t")), $data(@actualPresentation@("field", "t")), "(2 / 2) Comparing structure.")
+
+    do $$$AssertEquals($get(expectedPresentation("field")), $get(@actualPresentation@("field")), "(1 / 2) Comparing data.")
+    do $$$AssertEquals($get(expectedPresentation("field", "t")), $get(@actualPresentation@("field", "t")), "(2 / 2) Comparing data.")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

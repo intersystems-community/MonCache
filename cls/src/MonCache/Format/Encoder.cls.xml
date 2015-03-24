@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Format.Encoder">
+<IncludeCode>MonCache</IncludeCode>
+<TimeCreated>63875,70599.086555</TimeCreated>
+
+<Method name="encode">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.MonCacheType</FormalSpec>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  if (data.isNull()) {
+    return ..encodeNull()
+  }
+
+  if (data.isBoolean()) {
+    return ..encodeBoolean(data)
+  }
+
+  if (data.isNumber()) {
+    return ..encodeNumber(data)
+  }
+
+  if (data.isString()) {
+    return ..encodeString(data)
+  }
+
+  if (data.isObjectId()) {
+    return ..encodeObjectId(data)
+  }
+
+  if (data.isArray()) {
+    return ..encodeArray(data)
+  }
+
+  if (data.isObject()) {
+    return ..encodeObject(data)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="encodeNull">
+<ClassMethod>1</ClassMethod>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[  return $$$array
+]]></Implementation>
+</Method>
+
+<Method name="encodeBoolean">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.Boolean</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    s presentation = $$$array
+    d presentation.addNumber(3)
+    d presentation.addNumber(data.getValue())
+
+    return presentation
+]]></Implementation>
+</Method>
+
+<Method name="encodeNumber">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.Number</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  s presentation = $$$array
+  d presentation.addNumber(1)
+  d presentation.addNumber(data.getValue())
+
+  return presentation
+]]></Implementation>
+</Method>
+
+<Method name="encodeString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.String</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  s presentation = $$$array
+  d presentation.addNumber(2)
+  d presentation.addString(data.getValue())
+
+  return presentation
+]]></Implementation>
+</Method>
+
+<Method name="encodeObjectId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>objectId:MonCache.Types.ObjectId</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  s presentation = $$$array
+  d presentation.addNumber(6)
+  d presentation.addString(objectId.getHex())
+
+  return presentation
+]]></Implementation>
+</Method>
+
+<Method name="encodeArray">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>array:MonCache.Types.Array</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  s presentation = $$$array
+  d presentation.addNumber(4)
+
+  for i = 1:1:array.size() {
+    s itemPresentation = ..encode(array.get(i - 1))
+
+    if (itemPresentation '= "") {
+      d presentation.add(itemPresentation)
+    }
+  }
+
+  return presentation
+]]></Implementation>
+</Method>
+
+<Method name="encodeObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  s presentation = $$$array
+  d presentation.addNumber(5)
+
+  s names = object.getNames()
+
+  for i = 1:1:names.Count() {
+    s name = names.GetAt(i)
+
+    s valuePresentation = ..encode(object.get(name))
+
+    if (valuePresentation '= "") {
+      s fieldPresentation = $$$array
+      d fieldPresentation.addString(name)
+      d fieldPresentation.add(valuePresentation)
+
+      d presentation.add(fieldPresentation)
+    }
+  }
+
+  return presentation
+]]></Implementation>
+</Method>
+</Class>
+</Export>

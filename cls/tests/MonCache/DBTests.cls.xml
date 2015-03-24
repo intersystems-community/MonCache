@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.DBTests">
+<IncludeCode>MonCache</IncludeCode>
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63877,67318.71259</TimeCreated>
+
+<Method name="TestDB">
+<Implementation><![CDATA[
+  d ..dropDB()
+
+  d ..doSFUR()
+]]></Implementation>
+</Method>
+
+<Method name="dropDB">
+<Private>1</Private>
+<Implementation><![CDATA[
+  d ##class(DB).drop("db")
+
+  d $$$AssertEquals(0, $data(^MonCache("db")), "Drop database ""db""")
+
+  d $$$AssertEquals($$$NO,  ##class(DB).exists("db"),    "Database ""db"" doesn't exist")
+  d $$$AssertEquals($$$YES, ##class(DB).notExists("db"), "Database ""db"" doesn't exist")
+
+  d $$$AssertEquals($$$NO,  ##class(DB).existsCollection("db", "collection"),    "Collection ""db.collection"" doesn't exist")
+  d $$$AssertEquals($$$YES, ##class(DB).notExistsCollection("db", "collection"), "Collection ""db.collection"" doesn't exist")
+]]></Implementation>
+</Method>
+
+<Method name="doSFUR">
+<Implementation><![CDATA[
+  s document = $$$object
+  d document.setNull("f1")
+  d document.setNumber("f2", 2015)
+  d document.setString("f3", "")
+  d document.setString("f4", "MonCache")
+  d document.setBoolean("f5", $$$YES)
+  d document.setBoolean("f6", $$$NO)
+
+  set savingResult = ##class(DB).save("db", "collection", document)
+
+  d $$$AssertEquals(1, savingResult.nInserted, "Inserted documents: 1")
+  d $$$AssertEquals(0, savingResult.nModified, "Modified documents: 0")
+  d $$$AssertEquals(0, savingResult.nRemoved,  "Removed documents: 0")
+
+  d $$$AssertEquals(10, $data(^MonCache("db")),                  "Structure #01")
+  d $$$AssertEquals(11, $data(^MonCache("db", "collection")),    "Structure #02")
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1)), "Structure #03")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "_id")),      "Structure #04")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "_id", "t")), "Structure #05")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "_id", "v")), "Structure #06")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f1")),      "Structure #07")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f1", "t")), "Structure #08")
+  d $$$AssertEquals(0,  $data(^MonCache("db", "collection", 1, "f1", "v")), "Structure #09")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f2")),      "Structure #10")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f2", "t")), "Structure #11")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f2", "v")), "Structure #12")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f3")),      "Structure #13")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f3", "t")), "Structure #14")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f3", "v")), "Structure #15")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f4")),      "Structure #16")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f4", "t")), "Structure #17")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f4", "v")), "Structure #18")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f5")),      "Structure #19")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f5", "t")), "Structure #20")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f5", "v")), "Structure #21")
+
+  d $$$AssertEquals(10, $data(^MonCache("db", "collection", 1, "f6")),      "Structure #22")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f6", "t")), "Structure #23")
+  d $$$AssertEquals(1,  $data(^MonCache("db", "collection", 1, "f6", "v")), "Structure #24")
+
+  d $$$AssertEquals($$$YES, ##class(DB).exists("db"),    "Database ""db"" exists")
+  d $$$AssertEquals($$$NO,  ##class(DB).notExists("db"), "Database ""db"" exists")
+
+  d $$$AssertEquals($$$YES, ##class(DB).existsCollection("db", "collection"),   "Collection ""db.collection"" exists")
+  d $$$AssertEquals($$$NO, ##class(DB).notExistsCollection("db", "collection"), "Collection ""db.collection"" exists")
+
+  d $$$AssertEquals("", $get(^MonCache("db")),                  "Values #01")
+  d $$$AssertEquals(1,  $get(^MonCache("db", "collection")),    "Values #02")
+  d $$$AssertEquals("", $get(^MonCache("db", "collection", 1)), "Values #03")
+
+  d $$$AssertEquals("",                           $get(^MonCache("db", "collection", 1, "_id")),      "Values #04")
+  d $$$AssertEquals("objectid",                   $get(^MonCache("db", "collection", 1, "_id", "t")), "Values #05")
+  d $$$AssertEquals(document.get("_id").getHex(), $get(^MonCache("db", "collection", 1, "_id", "v")), "Values #06")
+
+  d $$$AssertEquals("",     $get(^MonCache("db", "collection", 1, "f1")),      "Values #07")
+  d $$$AssertEquals("null", $get(^MonCache("db", "collection", 1, "f1", "t")), "Values #08")
+  d $$$AssertEquals("",     $get(^MonCache("db", "collection", 1, "f1", "v")), "Values #09")
+
+  d $$$AssertEquals("",       $get(^MonCache("db", "collection", 1, "f2")),      "Values #10")
+  d $$$AssertEquals("number", $get(^MonCache("db", "collection", 1, "f2", "t")), "Values #11")
+  d $$$AssertEquals("2015",   $get(^MonCache("db", "collection", 1, "f2", "v")), "Values #12")
+
+  d $$$AssertEquals("",       $get(^MonCache("db", "collection", 1, "f3")),      "Values #13")
+  d $$$AssertEquals("string", $get(^MonCache("db", "collection", 1, "f3", "t")), "Values #14")
+  d $$$AssertEquals("",       $get(^MonCache("db", "collection", 1, "f3", "v")), "Values #15")
+
+  d $$$AssertEquals("",         $get(^MonCache("db", "collection", 1, "f4")),      "Values #16")
+  d $$$AssertEquals("string",   $get(^MonCache("db", "collection", 1, "f4", "t")), "Values #17")
+  d $$$AssertEquals("MonCache", $get(^MonCache("db", "collection", 1, "f4", "v")), "Values #18")
+
+  d $$$AssertEquals("",        $get(^MonCache("db", "collection", 1, "f5")),      "Values #19")
+  d $$$AssertEquals("boolean", $get(^MonCache("db", "collection", 1, "f5", "t")), "Values #20")
+  d $$$AssertEquals("true",    $get(^MonCache("db", "collection", 1, "f5", "v")), "Values #21")
+
+  d $$$AssertEquals("",        $get(^MonCache("db", "collection", 1, "f6")),      "Values #22")
+  d $$$AssertEquals("boolean", $get(^MonCache("db", "collection", 1, "f6", "t")), "Values #23")
+  d $$$AssertEquals("false",   $get(^MonCache("db", "collection", 1, "f6", "v")), "Values #24")
+
+  s loadedDocuments = ##class(DB).find("db", "collection")
+
+  d $$$AssertEquals(1, loadedDocuments.Count(), "Documents count: 1")
+
+  s query = $$$object
+  d query.set("_id", document.get("_id"))
+
+  s loadedDocument = ##class(DB).findOne("db", "collection", query)
+
+  d $$$AssertEquals($$$YES, document.equals(loadedDocument), "Loaded document must be the same")
+
+  s query = $$$object
+  d query.set("_id", $$$object)
+  d query.get("_id").set("$eq", document.get("_id"))
+
+  s modifications = $$$object
+  d modifications.set("$set", $$$object)
+  d modifications.get("$set").setNumber("f2", 10.07)
+  d modifications.set("$unset", $$$object)
+  d modifications.get("$unset").setString("f3", "")
+
+  s modificationsResult = ##class(DB).update("db", "collection", query, modifications)
+
+  d $$$AssertEquals(0, modificationsResult.nInserted, "Inserted documents: 0")
+  d $$$AssertEquals(1, modificationsResult.nModified, "Modified documents: 1")
+  d $$$AssertEquals(0, modificationsResult.nRemoved,  "Removed documents: 0")
+
+  s loadedDocument = ##class(DB).findOne("db", "collection", query)
+
+  d $$$AssertEquals(6, loadedDocument.size(), "Updated document size: 6")
+
+  d $$$AssertEquals($$$YES, loadedDocument.contains("f1"), "Updated document contains field ""f1""? YES")
+  d $$$AssertEquals($$$YES, loadedDocument.contains("f2"), "Updated document contains field ""f2""? YES")
+  d $$$AssertEquals($$$NO,  loadedDocument.contains("f3"), "Updated document contains field ""f3""? NO")
+  d $$$AssertEquals($$$YES, loadedDocument.contains("f4"), "Updated document contains field ""f4""? YES")
+  d $$$AssertEquals($$$YES, loadedDocument.contains("f5"), "Updated document contains field ""f5""? YES")
+  d $$$AssertEquals($$$YES, loadedDocument.contains("f6"), "Updated document contains field ""f6""? YES")
+
+  d $$$AssertEquals($$$YES, $$$number(10.07).equals(loadedDocument.get("f2")), "Field ""f2"" changed to 10.07")
+
+  s document = loadedDocument
+
+  s query = $$$object
+  d query.set("f1", $$$object)
+  d query.get("f1").set("$exists", $$$true)
+  d query.set("f2", $$$object)
+  d query.get("f2").set("$exists", $$$true)
+  d query.set("f3", $$$object)
+  d query.get("f3").set("$exists", $$$false)
+  d query.set("f4", $$$object)
+  d query.get("f4").set("$exists", $$$true)
+  d query.set("f5", $$$object)
+  d query.get("f5").set("$exists", $$$true)
+  d query.set("f6", $$$object)
+  d query.get("f6").set("$not", $$$object)
+  d query.get("f6").get("$not").set("$exists", $$$false)
+  d query.set("f7", $$$object)
+  d query.get("f7").set("$not", $$$object)
+  d query.get("f7").get("$not").set("$exists", $$$true)
+
+  s loadedDocument = ##class(DB).findOne("db", "collection", query)
+
+  d $$$AssertEquals($$$YES, document.equals(loadedDocument), "Found document by $exists operator")
+
+  s document = loadedDocument
+
+  s query = $$$object
+  d query.set("_id", $$$object)
+  d query.get("_id").set("$ne", $$$null)
+
+  s modifications = $$$object
+  d modifications.set("$rename", $$$object)
+  d modifications.get("$rename").setString("f1", "field1")
+  d modifications.get("$rename").setString("f2", "field2")
+  d modifications.get("$rename").setString("f4", "field3")
+  d modifications.get("$rename").setString("f5", "field4")
+  d modifications.get("$rename").setString("f6", "field5")
+
+  s modificationsResult = ##class(DB).update("db", "collection", query, modifications)
+
+  d $$$AssertEquals(0, modificationsResult.nInserted, "Inserted documents: 0")
+  d $$$AssertEquals(1, modificationsResult.nModified, "Modified documents: 1")
+  d $$$AssertEquals(0, modificationsResult.nRemoved,  "Removed documents: 0")
+
+  s projection = $$$object
+  d projection.set("_id", $$$false)
+
+  s loadedDocument = ##class(DB).findOne("db", "collection", query, projection)
+
+  d $$$AssertEquals(5, loadedDocument.size(), "Updated document size: 5")
+
+  d $$$AssertEquals($$$YES, document.get("f1").equals(loadedDocument.get("field1")), "Field ""f1"" equals field ""field1""")
+  d $$$AssertEquals($$$YES, document.get("f2").equals(loadedDocument.get("field2")), "Field ""f2"" equals field ""field2""")
+  d $$$AssertEquals($$$YES, document.get("f4").equals(loadedDocument.get("field3")), "Field ""f4"" equals field ""field3""")
+  d $$$AssertEquals($$$YES, document.get("f5").equals(loadedDocument.get("field4")), "Field ""f5"" equals field ""field4""")
+  d $$$AssertEquals($$$YES, document.get("f6").equals(loadedDocument.get("field5")), "Field ""f6"" equals field ""field5""")
+
+  s query = $$$object
+  d query.set("field2", $$$object)
+  d query.get("field2").setNumber("$lt", 11)
+  d query.get("field2").setNumber("$gt", 10)
+
+  s removingResult = ##class(DB).remove("db", "collection", query)
+
+  d $$$AssertEquals(0, removingResult.nInserted, "Inserted documents: 0")
+  d $$$AssertEquals(0, removingResult.nModified, "Modified documents: 0")
+  d $$$AssertEquals(1, removingResult.nRemoved, "Removed documents: 1")
+
+  s loadedDocuments = ##class(DB).find("db", "collection")
+
+  d $$$AssertEquals(0, loadedDocuments.Count(), "Collection is empty")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

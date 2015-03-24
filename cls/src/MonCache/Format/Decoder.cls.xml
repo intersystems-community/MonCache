@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Format.Decoder">
+<IncludeCode>MonCache</IncludeCode>
+<TimeCreated>63875,70599.122944</TimeCreated>
+
+<Method name="decode">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  if (data.Count() = 0) {
+    return $$$null
+  }
+
+  set typeMarker = data.GetAt(1)
+
+  if (typeMarker = 1) {
+    return ..decodeNumber(data)
+  }
+
+  if (typeMarker = 2) {
+    return ..decodeString(data)
+  }
+
+  if (typeMarker = 3) {
+    return ..decodeBoolean(data)
+  }
+
+  if (typeMarker = 4) {
+    return ..decodeArray(data)
+  }
+
+  if (typeMarker = 5) {
+    return ..decodeObject(data)
+  }
+
+  if (typeMarker = 6) {
+    return ..decodeObjectId(data)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="decodeBoolean">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Boolean</ReturnType>
+<Implementation><![CDATA[  return $case(data.GetAt(2), 0:$$$false, :$$$true)
+]]></Implementation>
+</Method>
+
+<Method name="decodeNumber">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Number</ReturnType>
+<Implementation><![CDATA[  return $$$number(data.GetAt(2))
+]]></Implementation>
+</Method>
+
+<Method name="decodeString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.String</ReturnType>
+<Implementation><![CDATA[  return $$$string(data.GetAt(2))
+]]></Implementation>
+</Method>
+
+<Method name="decodeObjectId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.ObjectId</ReturnType>
+<Implementation><![CDATA[  return $$$objectId(data.GetAt(2))
+]]></Implementation>
+</Method>
+
+<Method name="decodeArray">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Array</ReturnType>
+<Implementation><![CDATA[
+  s array = $$$array
+
+  for i = 2:1:data.Count() {
+    s itemPresentation = data.GetAt(i)
+
+    s item = ..decode(itemPresentation)
+
+    if (item '= "") {
+      d array.add(item)
+    }
+  }
+
+  return array
+]]></Implementation>
+</Method>
+
+<Method name="decodeObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%Collection.AbstractList</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Object</ReturnType>
+<Implementation><![CDATA[
+  s object = $$$object
+
+  for i = 2:1:data.Count() {
+    s fieldPresentation = data.GetAt(i)
+
+    s name = fieldPresentation.GetAt(1)
+
+    s value = ..decode(fieldPresentation.GetAt(2))
+
+    d object.set(name, value)
+  }
+
+  return object
+]]></Implementation>
+</Method>
+</Class>
+</Export>

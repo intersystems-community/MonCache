@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.QueryAnd">
+<IncludeCode>MonCache.Utils</IncludeCode>
+<Super>Query</Super>
+<TimeCreated>63875,70599.317764</TimeCreated>
+
+<Property name="queries">
+<Type>Query</Type>
+<Collection>list</Collection>
+<Private>1</Private>
+</Property>
+
+<Method name="add">
+<FormalSpec>query:Query</FormalSpec>
+<Implementation><![CDATA[  d ..queries.Insert(query)
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+  s string = ""
+
+  for i = 1:1:..queries.Count() {
+    s query = ..queries.GetAt(i)
+
+    s string = string_$select($$$strings.isEmpty(string): "", 1: ",")_(query.toString())
+  }
+
+  return "{$and: ["_string_"]}"
+]]></Implementation>
+</Method>
+
+<Method name="isSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+  for i = 1:1:..queries.Count() {
+    s query = ..queries.GetAt(i)
+
+    if (query.isNotSatisfied(object)) {
+      return $$$NO
+    }
+  }
+
+  return $$$YES
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Utils.Strings">
+<TimeCreated>63875,70600.081762</TimeCreated>
+
+<Method name="toLowerCase">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>string:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return $zconvert(string, "l")
+]]></Implementation>
+</Method>
+
+<Method name="toUpperCase">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>string:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return $zconvert(string, "u")
+]]></Implementation>
+</Method>
+
+<Method name="isEmpty">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>string:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return string = ""
+]]></Implementation>
+</Method>
+
+<Method name="isNotEmpty">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>string:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..isEmpty(string)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

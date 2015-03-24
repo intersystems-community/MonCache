@@ -1,0 +1,23 @@
+Cache for UNIX^INC^routine output by %apiRTN^^~Format=Cache.S~^UTF8
+%RO on 06 Sep 2015 11:08:05AM
+MonCache^INC^^63640,34462.852324^0
+#define null              ##class(MonCache.Types.Null).getInstance()
+.
+#define boolean(%value)   ##class(MonCache.Types.Boolean).%New(%value)
+.
+#define true              ##class(MonCache.Types.Boolean).getTrueInstance()
+.
+#define false             ##class(MonCache.Types.Boolean).getFalseInstance()
+.
+#define string(%value)    ##class(MonCache.Types.String).%New(%value)
+.
+#define number(%value)    ##class(MonCache.Types.Number).%New(%value)
+.
+#define objectId(%hex)    ##class(MonCache.Types.ObjectId).%New(%hex)
+.
+#define array             ##class(MonCache.Types.Array).%New()
+.
+#define object            ##class(MonCache.Types.Object).%New()
+
+
+

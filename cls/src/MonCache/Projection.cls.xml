@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Projection">
+<IncludeCode>MonCache</IncludeCode>
+<TimeCreated>63875,70599.282536</TimeCreated>
+
+<Method name="project">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>document:MonCache.Types.Object,projection:MonCache.Types.Object</FormalSpec>
+<Implementation><![CDATA[
+    if (document.isEmpty() || (projection = "") || projection.isEmpty()) {
+        return
+    }
+
+    if (..isIncludeRestrictions(projection)) {
+        do ..applyIncludeRestrictions(document, projection)
+    }
+    elseif (..isExcludeRestrictions(projection)) {
+        do ..applyExcludeRestrictions(document, projection)
+    }
+]]></Implementation>
+</Method>
+
+<Method name="isIncludeRestrictions">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>projection:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+    set restrictionFieldNames = projection.getNames()
+
+    for i = 1:1:restrictionFieldNames.Count() {
+        set restrictionFieldName = restrictionFieldNames.GetAt(i)
+
+        set restrictionType = projection.get(restrictionFieldName)
+
+        if (restrictionType.isNumber()) {
+            set isIncludeRestriction = ##class(MonCache.Types.Number) restrictionType.getValue() = 1
+
+            if ('isIncludeRestriction) {
+                return $$$NO
+            }
+        }
+        elseif (restrictionType.isBoolean()) {
+            set isIncludeRestriction = ##class(MonCache.Types.Boolean) restrictionType.equals($$$true)
+
+            if ('isIncludeRestriction) {
+                return $$$NO
+            }
+        }
+    }
+
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="applyIncludeRestrictions">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>document:MonCache.Types.Object,projection:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+    set documentFieldNames = document.getNames()
+
+    for i = 1:1:documentFieldNames.Count() {
+        set documentFieldName = documentFieldNames.GetAt(i)
+
+        if (projection.notContains(documentFieldName) && (documentFieldName '= "_id")) {
+            do document.remove(documentFieldName)
+        }
+    }
+]]></Implementation>
+</Method>
+
+<Method name="isExcludeRestrictions">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>projection:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+    set restrictionFieldNames = projection.getNames()
+
+    for i = 1:1:restrictionFieldNames.Count() {
+        set restrictionFieldName = restrictionFieldNames.GetAt(i)
+
+        set restrictionType = projection.get(restrictionFieldName)
+
+        if (restrictionType.isNumber()) {
+            set isExcludeRestriction = ##class(MonCache.Types.Number) restrictionType.getValue() = 0
+
+            if ('isExcludeRestriction) {
+                return $$$NO
+            }
+        }
+        elseif (restrictionType.isBoolean()) {
+            set isExcludeRestriction = ##class(MonCache.Types.Boolean) restrictionType.equals($$$false)
+
+            if ('isExcludeRestriction) {
+                return $$$NO
+            }
+        }
+    }
+
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="applyExcludeRestrictions">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>document:MonCache.Types.Object,projection:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+    set documentFieldNames = document.getNames()
+
+    for i = 1:1:documentFieldNames.Count() {
+        set documentFieldName = documentFieldNames.GetAt(i)
+
+        if (projection.contains(documentFieldName)) {
+            do document.remove(documentFieldName)
+        }
+    }
+]]></Implementation>
+</Method>
+</Class>
+</Export>

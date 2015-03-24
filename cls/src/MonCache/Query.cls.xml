@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Query">
+<Abstract>1</Abstract>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63875,70599.611866</TimeCreated>
+
+<Method name="toString">
+<Abstract>1</Abstract>
+<ReturnType>%String</ReturnType>
+</Method>
+
+<Method name="isSatisfied">
+<Abstract>1</Abstract>
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+</Method>
+
+<Method name="isNotSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '..isSatisfied(object)
+]]></Implementation>
+</Method>
+
+<Method name="build">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>queryObject:MonCache.Types.Object</FormalSpec>
+<ReturnType>Query</ReturnType>
+<Implementation><![CDATA[
+  if ((queryObject = "") || queryObject.isEmpty()) {
+    return ##class(EmptyQuery).%New()
+  }
+
+  s normalizedQuery = ##class(QueryAnd).%New()
+
+  s parameterNames = queryObject.getNames()
+
+  for i = 1:1:parameterNames.Count() {
+    s parameterName = parameterNames.GetAt(i)
+
+    s parameterValue = queryObject.get(parameterName)
+
+    if (parameterValue.isObject() && parameterValue.isNotEmpty()) {
+      if (..isOperatorsObject(parameterValue)) {
+        s operators = parameterValue
+
+        s operatorNames = parameterValue.getNames()
+
+        for j = 1:1:operatorNames.Count() {
+          s operatorName = operatorNames.GetAt(j)
+
+          s query = ..createQuery(parameterName, operatorName, operators)
+
+          if (query '= "") {
+            d normalizedQuery.add(query)
+          }
+        }
+      } else {
+        d normalizedQuery.add(..createQueryEquals(parameterName, parameterValue))
+      }
+    } else {
+      d normalizedQuery.add(..createQueryEquals(parameterName, parameterValue))
+    }
+  }
+
+  return normalizedQuery
+]]></Implementation>
+</Method>
+
+<Method name="isOperatorName">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+  if (name = "$exists") {
+    return $$$YES
+  }
+
+  if (name = "$eq") {
+    return $$$YES
+  }
+
+  if (name = "$not") {
+    return $$$YES
+  }
+
+  if (name = "$ne") {
+    return $$$YES
+  }
+
+  if (name = "$lt") {
+    return $$$YES
+  }
+
+  if (name = "$gt") {
+    return $$$YES
+  }
+
+  return $$$NO
+]]></Implementation>
+</Method>
+
+<Method name="isNotOperatorName">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '..isOperatorName(name)
+]]></Implementation>
+</Method>
+
+<Method name="isOperatorsObject">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>object:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+  s names = object.getNames()
+
+  for i = 1:1:names.Count() {
+    s name = names.GetAt(i)
+
+    if (..isNotOperatorName(name)) {
+      return $$$NO
+    }
+  }
+
+  return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="createQuery">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,operatorName:%String,operators:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryExists</ReturnType>
+<Implementation><![CDATA[
+  if (..isOperatorName(operatorName)) {
+    s parameterValue = operators.get(operatorName)
+
+    if (operatorName = "$exists") {
+      return ..createQueryExists(parameterName, parameterValue)
+    }
+
+    if (operatorName = "$eq") {
+      return ..createQueryEquals(parameterName, parameterValue)
+    }
+
+    if (operatorName = "$not") {
+      return ..createQueryNot(parameterName, parameterValue)
+    }
+
+    if (operatorName = "$ne") {
+      return ..createQueryNe(parameterName, parameterValue)
+    }
+
+    if (operatorName = "$lt") {
+      return ..createQueryLt(parameterName, parameterValue)
+    }
+
+    if (operatorName = "$gt") {
+      return ..createQueryGt(parameterName, parameterValue)
+    }
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="createQueryExists">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryExists</ReturnType>
+<Implementation><![CDATA[
+  if (parameterValue.isBoolean()) {
+    return ##class(MonCache.QueryExists).%New(parameterName, parameterValue)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="createQueryEquals">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryEquals</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.QueryEquals).%New(parameterName, parameterValue)
+]]></Implementation>
+</Method>
+
+<Method name="createQueryNot">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryNot</ReturnType>
+<Implementation><![CDATA[
+  if (parameterValue.isObject() && (parameterValue.size() = 1)) {
+    s operatorName = parameterValue.getNames().GetAt(1)
+
+    s query = ..createQuery(parameterName, operatorName, parameterValue)
+
+    if (query '= "") {
+      return ##class(MonCache.QueryNot).%New(query)
+    }
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="createQueryNe">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryNe</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.QueryNe).%New(parameterName, parameterValue)
+]]></Implementation>
+</Method>
+
+<Method name="createQueryLt">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryNe</ReturnType>
+<Implementation><![CDATA[
+  if (parameterValue.isNumber()) {
+    return ##class(MonCache.QueryLt).%New(parameterName, parameterValue)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="createQueryGt">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameterName:%String,parameterValue:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.QueryNe</ReturnType>
+<Implementation><![CDATA[
+  if (parameterValue.isNumber()) {
+    return ##class(MonCache.QueryGt).%New(parameterName, parameterValue)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+</Class>
+</Export>

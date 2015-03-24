@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Utils.Collections">
+<TimeCreated>63875,70600.015275</TimeCreated>
+
+<Method name="newList">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Library.ListOfDataTypes</ReturnType>
+<Implementation><![CDATA[    return ##class(%Library.ListOfDataTypes).%New()
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Format.FormatterTests">
+<IncludeCode>MonCache</IncludeCode>
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63876,59046.259173</TimeCreated>
+
+<Method name="TestFormatterWhenGivenNull">
+<Implementation><![CDATA[
+  s string = "[]"
+
+  s data = $$$null
+
+  d ..assertFormat(string, data, "null")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenNumber">
+<Implementation><![CDATA[
+  s string = "[1,2015]"
+
+  s data = $$$number(2015)
+
+  d ..assertFormat(string, data, "Number")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenEmptyString">
+<Implementation><![CDATA[
+  s string = "[2,""""]"
+
+  s data = $$$string("")
+
+  d ..assertFormat(string, data, "String / Empty")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenString">
+<Implementation><![CDATA[
+  s string = "[2,""MonCache""]"
+
+  s data = $$$string("MonCache")
+
+  d ..assertFormat(string, data, "String")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenTrue">
+<Implementation><![CDATA[
+  s string = "[3,1]"
+
+  s data = $$$true
+
+  d ..assertFormat(string, data, "Boolean / true")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenFalse">
+<Implementation><![CDATA[
+  s string = "[3,0]"
+
+  s data = $$$false
+
+  d ..assertFormat(string, data, "Boolean / false")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenEmptyArray">
+<Implementation><![CDATA[
+  s string = "[4]"
+
+  s data = $$$array
+
+  d ..assertFormat(string, data, "Array / Empty")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenArray">
+<Implementation><![CDATA[
+  s string = "[4,"
+  s string = string_"[],"
+  s string = string_"[1,2015],"
+  s string = string_"[2,""""],"
+  s string = string_"[2,""MonCache""],"
+  s string = string_"[3,1],"
+  s string = string_"[3,0]"
+  s string = string_"]"
+
+  s data = $$$array
+  d data.addNull()
+  d data.addNumber(2015)
+  d data.addString("")
+  d data.addString("MonCache")
+  d data.addBoolean($$$YES)
+  d data.addBoolean($$$NO)
+
+  d ..assertFormat(string, data, "Array")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenEmptyObject">
+<Implementation><![CDATA[
+  s string = "[5]"
+
+  s data = $$$object
+
+  d ..assertFormat(string, data, "Object / Empty")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenObject">
+<Implementation><![CDATA[
+  s string = "[5,"
+  s string = string_"[""f1"",[]],"
+  s string = string_"[""f2"",[1,2015]],"
+  s string = string_"[""f3"",[2,""""]],"
+  s string = string_"[""f4"",[2,""MonCache""]],"
+  s string = string_"[""f5"",[3,1]],"
+  s string = string_"[""f6"",[3,0]]"
+  s string = string_"]"
+
+  s data = $$$object
+  d data.setNull("f1")
+  d data.setNumber("f2", 2015)
+  d data.setString("f3", "")
+  d data.setString("f4", "MonCache")
+  d data.setBoolean("f5", $$$YES)
+  d data.setBoolean("f6", $$$NO)
+
+  d ..assertFormat(string, data, "Object")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenObjectId">
+<Implementation><![CDATA[
+  s data = $$$objectId()
+
+  s string = "[6,"""_data.getHex()_"""]"
+
+  d ..assertFormat(string, data, "ObjectId")
+]]></Implementation>
+</Method>
+
+<Method name="TestFormatterWhenGivenObjectIdWithHex">
+<Implementation><![CDATA[
+  s data = $$$objectId("253eb8ee860c8b060032fa42")
+
+  s string = "[6,"""_data.getHex()_"""]"
+
+  d ..assertFormat(string, data, "ObjectId / Hex")
+]]></Implementation>
+</Method>
+
+<Method name="assertFormat">
+<FormalSpec>string:%String,data:MonCache.Types.MonCacheType,typeName:%String</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+  d ..assertToString(string, data, "{ "_typeName_"} to string")
+
+  d ..assertFromString(string, data, "{ "_typeName_"} from string")
+]]></Implementation>
+</Method>
+
+<Method name="assertToString">
+<FormalSpec>string:%String,data:MonCache.Types.MonCacheType,message:%String</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[  d $$$AssertEquals(string, ..toString(data), message)
+]]></Implementation>
+</Method>
+
+<Method name="assertFromString">
+<FormalSpec>string:%String,data:MonCache.Types.MonCacheType,message:%String</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[  d $$$AssertEquals($$$YES, ..fromString(string).equals(data), message)
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.Format.Formatter).toString(data)
+]]></Implementation>
+</Method>
+
+<Method name="fromString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.Format.Formatter).fromString(data)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

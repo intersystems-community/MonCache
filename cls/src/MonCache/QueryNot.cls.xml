@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.QueryNot">
+<Super>MonCache.Query</Super>
+<TimeCreated>63875,70599.53418</TimeCreated>
+
+<Property name="query">
+<Type>Query</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>query:Query</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+  s ..query = query
+
+  return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return "{$not: "_(..query.toString())_"}"
+]]></Implementation>
+</Method>
+
+<Method name="isSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '..query.isSatisfied(object)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

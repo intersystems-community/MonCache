@@ -1,0 +1,28 @@
+Cache for UNIX^MAC^routine output by %apiRTN^^~Format=Cache.S~^UTF8
+%RO on 16 Nov 2015 07:05:10PM
+MonCacheDriver^MAC^^63872,68535^0
+MonCacheDriver ;
+ 
+insert(db, collection, document) PUBLIC
+ { return ##class(MonCache.Driver).insert(db, collection, document) }
+ 
+save(db, collection, document) PUBLIC
+ { return ##class(MonCache.Driver).save(db, collection, document) }
+ 
+count(db, collection, query = "") PUBLIC
+ { return ##class(MonCache.Driver).count(db, collection, query) }
+ 
+find(db, collection, query = "", projection = "") PUBLIC
+ { return ##class(MonCache.Driver).find(db, collection, query, projection) }
+ 
+findOne(db, collection, query = "", projection = "") PUBLIC
+ { return ##class(MonCache.Driver).findOne(db, collection, query, projection) }
+ 
+update(db, collection, query, modifications, parameters = "") PUBLIC
+ { return ##class(MonCache.Driver).update(db, collection, query, modifications, parameters) }
+ 
+remove(db, collection, query = "", parameters = "") PUBLIC
+ { return ##class(MonCache.Driver).remove(db, collection, query, parameters) }
+
+
+

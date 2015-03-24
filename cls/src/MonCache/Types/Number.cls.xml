@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.Number">
+<IncludeCode>MonCache</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.812163</TimeCreated>
+
+<Property name="value">
+<Type>%Numeric</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>value:%Numeric</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+    set ..value = value
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="isNumber">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="getValue">
+<ReturnType>%Numeric</ReturnType>
+<Implementation><![CDATA[    return ..value
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeNumber
+    set @node@("v") = ..value
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeNumber) {
+        if ($isvalidnum($get(@node@("v")))) {
+            return $$$number($get(@node@("v")))
+        }
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    return ..value = ##class(Number) value.getValue()
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return $fnumber(..value, "")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

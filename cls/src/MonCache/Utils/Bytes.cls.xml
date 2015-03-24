@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Utils.Bytes">
+<TimeCreated>63875,70599.982064</TimeCreated>
+
+<Parameter name="OneByteNumber">
+<Default>256</Default>
+</Parameter>
+
+<Parameter name="OneByteNormalizer">
+<Default>255</Default>
+</Parameter>
+
+<Parameter name="TwoBytesNumber">
+<Default>65536</Default>
+</Parameter>
+
+<Parameter name="TwoBytesNormalizer">
+<Default>65535</Default>
+</Parameter>
+
+<Parameter name="ThreeBytesNumber">
+<Default>16777216</Default>
+</Parameter>
+
+<Parameter name="ThreeBytesNormalizer">
+<Default>16777215</Default>
+</Parameter>
+
+<Parameter name="FourBytesNumber">
+<Default>4294967296</Default>
+</Parameter>
+
+<Parameter name="FourBytesNormalizer">
+<Default>4294967295</Default>
+</Parameter>
+
+<Method name="normTo1byte">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..and(number, ..#OneByteNormalizer)
+]]></Implementation>
+</Method>
+
+<Method name="normTo2bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..and(number, ..#TwoBytesNormalizer)
+]]></Implementation>
+</Method>
+
+<Method name="normTo3bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..and(number, ..#ThreeBytesNormalizer)
+]]></Implementation>
+</Method>
+
+<Method name="normTo4bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..and(number, ..#FourBytesNormalizer)
+]]></Implementation>
+</Method>
+
+<Method name="integerFrom2bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>byte1:%SmallInt,byte2:%SmallInt</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..integerFrom3bytes(0, byte1, byte2)
+]]></Implementation>
+</Method>
+
+<Method name="integerFrom3bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>byte1:%SmallInt,byte2:%SmallInt,byte3:%SmallInt</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..integerFrom4bytes(0, byte1, byte2, byte3)
+]]></Implementation>
+</Method>
+
+<Method name="integerFrom4bytes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>byte1:%SmallInt,byte2:%SmallInt,byte3:%SmallInt,byte4:%SmallInt</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return (byte1 * ..#ThreeBytesNumber) + (byte2 * ..#TwoBytesNumber) + (byte3 * ..#OneByteNumber) + byte4
+]]></Implementation>
+</Method>
+
+<Method name="and">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>value1:%Integer,value2:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return $zboolean(value1, value2, 1)
+]]></Implementation>
+</Method>
+
+<Method name="byte1">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%SmallInt</ReturnType>
+<Implementation><![CDATA[    return number # ..#OneByteNumber
+]]></Implementation>
+</Method>
+
+<Method name="byte2">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%SmallInt</ReturnType>
+<Implementation><![CDATA[    return number # ..#TwoBytesNumber \ ..#OneByteNumber
+]]></Implementation>
+</Method>
+
+<Method name="byte3">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%SmallInt</ReturnType>
+<Implementation><![CDATA[    return number # ..#ThreeBytesNumber \ ..#TwoBytesNumber
+]]></Implementation>
+</Method>
+
+<Method name="byte4">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>number:%Integer</FormalSpec>
+<ReturnType>%SmallInt</ReturnType>
+<Implementation><![CDATA[    return number # ..#FourBytesNumber \ ..#ThreeBytesNumber
+]]></Implementation>
+</Method>
+</Class>
+</Export>

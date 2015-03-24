@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.Array">
+<IncludeCode>MonCache,MonCache.Utils</IncludeCode>
+<Super>MonCacheType</Super>
+<TimeCreated>63875,70599.651269</TimeCreated>
+
+<Property name="items">
+<Type>MonCacheType</Type>
+<Collection>list</Collection>
+</Property>
+
+<Method name="isArray">
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="addNull">
+<Implementation><![CDATA[    do ..add($$$null)
+]]></Implementation>
+</Method>
+
+<Method name="addBoolean">
+<FormalSpec>value:%Boolean</FormalSpec>
+<Implementation><![CDATA[    do ..add($$$boolean(value))
+]]></Implementation>
+</Method>
+
+<Method name="addString">
+<FormalSpec>value:%String</FormalSpec>
+<Implementation><![CDATA[    do ..add($$$string(value))
+]]></Implementation>
+</Method>
+
+<Method name="addNumber">
+<FormalSpec>value:%Numeric</FormalSpec>
+<Implementation><![CDATA[    do ..add($$$number(value))
+]]></Implementation>
+</Method>
+
+<Method name="add">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<Implementation><![CDATA[
+    set item = $select($this = value: value.%ConstructClone($$$YES), 1: value)
+
+    do ..items.Insert(item)
+]]></Implementation>
+</Method>
+
+<Method name="contains">
+<FormalSpec>index:%Integer</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return 0 <= index <= (..size() - 1)
+]]></Implementation>
+</Method>
+
+<Method name="notContains">
+<FormalSpec>index:%Integer</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return '..contains(index)
+]]></Implementation>
+</Method>
+
+<Method name="get">
+<FormalSpec>index:%Integer</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[    return ..items.GetAt(index + 1)
+]]></Implementation>
+</Method>
+
+<Method name="set">
+<FormalSpec>index:%Integer,value:MonCacheType</FormalSpec>
+<Implementation><![CDATA[
+    if (..contains(index)) {
+        set item = $select($this = value: value.%ConstructClone($$$YES), 1: value)
+
+        do ..items.SetAt(item, index + 1)
+    }
+]]></Implementation>
+</Method>
+
+<Method name="size">
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    return ..items.Count()
+]]></Implementation>
+</Method>
+
+<Method name="remove">
+<FormalSpec>index:%Integer</FormalSpec>
+<Implementation><![CDATA[    do ..items.RemoveAt(index)
+]]></Implementation>
+</Method>
+
+<Method name="clear">
+<Implementation><![CDATA[    do ..items.Clear()
+]]></Implementation>
+</Method>
+
+<Method name="toGlobal">
+<FormalSpec>node:%String</FormalSpec>
+<Implementation><![CDATA[
+    set @node@("t") = ##class(MonCacheType).#TypeArray
+
+    for i = 0:1:(..size() - 1) {
+        set item = ..get(i)
+
+        do item.toGlobal($name(@node@("v", i)))
+    }
+]]></Implementation>
+</Method>
+
+<Method name="fromGlobal">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>node:%String</FormalSpec>
+<ReturnType>MonCacheType</ReturnType>
+<Implementation><![CDATA[
+    set array = $$$array
+
+    if ($get(@node@("t")) = ##class(MonCacheType).#TypeArray) {
+        set index = $order(@node@("v", ""))
+
+        while (index '= "") {
+            set itemNode = $name(@node@("v", index))
+
+            set item = ##class(MonCacheType).fromGlobal(itemNode)
+
+            if (item '= "") {
+                do array.add(item)
+            }
+
+            set index = $order(@itemNode)
+        }
+
+        return array
+    }
+
+    return ""
+]]></Implementation>
+</Method>
+
+<Method name="equals">
+<FormalSpec>value:MonCacheType</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    if ($classname($this) '= $classname(value)) {
+        return $$$NO
+    }
+
+    if (..size() '= ##class(Array) value.size()) {
+        return $$$NO
+    }
+
+    for i = 0:1:(..size() - 1) {
+        set item = ..get(i)
+
+        set arrayItem = ##class(Array) value.get(i)
+
+        if (item.notEquals(arrayItem)) {
+            return $$$NO
+        }
+    }
+
+    return $$$YES
+]]></Implementation>
+</Method>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    set string = ""
+
+    for i = 0:1:(..size() - 1) {
+        set item = ..get(i)
+
+        set string = string_$select($$$strings.isEmpty(string): "", 1: ",")_(item.toString())
+    }
+
+    return "["_string_"]"
+]]></Implementation>
+</Method>
+</Class>
+</Export>

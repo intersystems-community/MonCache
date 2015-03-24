@@ -1,0 +1,5 @@
+MonCache - Caché as MongoDB.
+
+The main purpose of the project is implementation basic MongoDB functions using Caché as a database engine.
+
+The project provides all needed Caché ObjectScript classes and routines.

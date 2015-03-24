@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Types.NumberTests">
+<IncludeCode>MonCache</IncludeCode>
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63876,59045.993157</TimeCreated>
+
+<Property name="number">
+<Type>MonCache.Types.Number</Type>
+<Private>1</Private>
+</Property>
+
+<Method name="OnBeforeAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set ..number = $$$number(123.456789)
+
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="TestTypePredicats">
+<Implementation><![CDATA[
+    do $$$AssertEquals($$$NO, ..number.isNull(), "(1 / 7) is not Null")
+
+    do $$$AssertEquals($$$NO, ..number.isBoolean(), "(2 / 7) is not Boolean")
+
+    do $$$AssertEquals($$$YES, ..number.isNumber(), "(3 / 7) is Number")
+
+    do $$$AssertEquals($$$NO, ..number.isString(), "(4 / 7) is not String")
+
+    do $$$AssertEquals($$$NO, ..number.isObjectId(), "(5 / 7) is not ObjectId")
+
+    do $$$AssertEquals($$$NO, ..number.isArray(), "(6 / 7) is not Array")
+
+    do $$$AssertEquals($$$NO, ..number.isObject(), "(7 / 7) is not Object")
+]]></Implementation>
+</Method>
+
+<Method name="TestJsonLikePresentation">
+<Implementation><![CDATA[
+    set expectedString = "123.456789"
+
+    set actualString = ..number.toString()
+
+    do $$$AssertEquals(expectedString, actualString, expectedString)
+]]></Implementation>
+</Method>
+
+<Method name="TestGlobalBasedPresentation">
+<Implementation><![CDATA[
+    set expectedPresentation("field", "t") = "number"
+    set expectedPresentation("field", "v") = ..number.getValue()
+
+
+    set actualPresentation = $name(^MonCacheTests("Types.NumberTests", "TestGlobalBasedPresentation"))
+
+    kill @actualPresentation
+
+    do ..number.toGlobal($name(@actualPresentation@("field")))
+
+
+    do $$$AssertEquals($data(expectedPresentation("field")), $data(@actualPresentation@("field")), "(1 / 3) Comparing structure.")
+    do $$$AssertEquals($data(expectedPresentation("field", "t")), $data(@actualPresentation@("field", "t")), "(2 / 3) Comparing structure.")
+    do $$$AssertEquals($data(expectedPresentation("field", "v")), $data(@actualPresentation@("field", "v")), "(3 / 3) Comparing structure.")
+
+    do $$$AssertEquals($get(expectedPresentation("field")), $get(@actualPresentation@("field")), "(1 / 3) Comparing data.")
+    do $$$AssertEquals($get(expectedPresentation("field", "t")), $get(@actualPresentation@("field", "t")), "(2 / 3) Comparing data.")
+    do $$$AssertEquals($get(expectedPresentation("field", "v")), $get(@actualPresentation@("field", "v")), "(3 / 3) Comparing data.")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

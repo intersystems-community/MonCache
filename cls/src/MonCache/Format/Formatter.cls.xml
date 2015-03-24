@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.Format.Formatter">
+<IncludeCode>MonCache</IncludeCode>
+<TimeCreated>63876,28394.001518</TimeCreated>
+
+<Method name="toString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:MonCache.Types.MonCacheType</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[  return ##class(MonCache.Format.Encoder).encode(data).toString()
+]]></Implementation>
+</Method>
+
+<Method name="fromString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>data:%String</FormalSpec>
+<ReturnType>MonCache.Types.MonCacheType</ReturnType>
+<Implementation><![CDATA[
+  if (data = "") {
+    return $$$object
+  } else {
+    d ##class(%ZEN.Auxiliary.jsonProvider).%ParseJSON(data, , .encodedData)
+
+    return ##class(MonCache.Format.Decoder).decode(encodedData)
+  }
+]]></Implementation>
+</Method>
+</Class>
+</Export>

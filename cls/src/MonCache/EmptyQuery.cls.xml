@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.EmptyQuery">
+<Super>Query</Super>
+<TimeCreated>63875,70599.211269</TimeCreated>
+
+<Method name="toString">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    return "{}"
+]]></Implementation>
+</Method>
+
+<Method name="isSatisfied">
+<FormalSpec>object:MonCache.Types.Object</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return $$$YES
+]]></Implementation>
+</Method>
+</Class>
+</Export>

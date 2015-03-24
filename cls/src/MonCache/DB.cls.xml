@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MonCache.DB">
+<IncludeCode>MonCache,MonCache.Utils</IncludeCode>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63875,70599.175215</TimeCreated>
+
+<Method name="create">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String</FormalSpec>
+<Implementation><![CDATA[
+  if (..notExists(db)) {
+    s ^MonCache(db) = ""
+  }
+]]></Implementation>
+</Method>
+
+<Method name="createCollection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String</FormalSpec>
+<Implementation><![CDATA[
+  d ..create(db)
+
+  if (..notExistsCollection(db, collection)) {
+    s ^MonCache(db, collection) = 0
+  }
+]]></Implementation>
+</Method>
+
+<Method name="drop">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String</FormalSpec>
+<Implementation><![CDATA[  k ^MonCache(db)
+]]></Implementation>
+</Method>
+
+<Method name="dropCollection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String</FormalSpec>
+<Implementation><![CDATA[  k ^MonCache(db, collection)
+]]></Implementation>
+</Method>
+
+<Method name="exists">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return ''$data(^MonCache(db))
+]]></Implementation>
+</Method>
+
+<Method name="existsCollection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return ''$data(^MonCache(db, collection))
+]]></Implementation>
+</Method>
+
+<Method name="notExists">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '..exists(db)
+]]></Implementation>
+</Method>
+
+<Method name="notExistsCollection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[  return '..existsCollection(db, collection)
+]]></Implementation>
+</Method>
+
+<Method name="collectionSize">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+  s documentsCount = 0
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s documentsCount = $increment(documentsCount)
+
+    s documentId = $order(@documentNode)
+  }
+
+  return documentsCount
+]]></Implementation>
+</Method>
+
+<Method name="insert">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,document:MonCache.Types.Object</FormalSpec>
+<ReturnType>MonCache.DB.Result</ReturnType>
+<Implementation><![CDATA[
+  if (document.contains("_id")) {
+    s documentNode = ..lookup(db, collection, document.get("_id"))
+
+    if (documentNode '= "") {
+      return ##class(MonCache.DB.Result).%New(0, 0, 0)
+    }
+  } else {
+    d document.set("_id", $$$objectId())
+  }
+
+  s documentNodeIndex = $increment(^MonCache(db, collection))
+
+  d ..persist(db, collection, documentNodeIndex, document)
+
+  return ##class(MonCache.DB.Result).%New(1, 0, 0)
+]]></Implementation>
+</Method>
+
+<Method name="save">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,document:MonCache.Types.Object</FormalSpec>
+<ReturnType>MonCache.DB.Result</ReturnType>
+<Implementation><![CDATA[
+  if (document.notContains("_id")) {
+    return ..insert(db, collection, document)
+  } else {
+    s documentNodeIndex = ..lookup(db, collection, document.get("_id"))
+
+    if (documentNodeIndex '= "") {
+      d ..persist(db, collection, documentNodeIndex, document)
+
+      return ##class(MonCache.DB.Result).%New(0, 1, 0)
+    }
+  }
+]]></Implementation>
+</Method>
+
+<Method name="lookup">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,id:MonCache.Types.MonCacheType</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s documentIdFieldNode = $name(@documentNode@("_id"))
+
+    s documentIdValue = ##class(MonCache.Types.MonCacheType).fromGlobal(documentIdFieldNode)
+
+    if (documentIdValue.equals(id)) {
+       return documentId
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="persist">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,documentNodeIndex:%Integer,document:MonCache.Types.Object</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+  tstart
+
+  if (..notExistsCollection(db, collection)) {
+    d ..createCollection(db, collection)
+  }
+
+  s documentNode = $name(^MonCache(db, collection, documentNodeIndex))
+
+  k @documentNode
+
+  s documentFieldNames = document.getNames()
+
+  for i = 1:1:documentFieldNames.Count() {
+    s documentFieldName = documentFieldNames.GetAt(i)
+
+    s documentFieldValue = document.get(documentFieldName)
+
+    s documentFieldNode = $name(@documentNode@(documentFieldName))
+
+    d documentFieldValue.toGlobal(documentFieldNode)
+  }
+
+  tcommit
+]]></Implementation>
+</Method>
+
+<Method name="find">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,query:MonCache.Types.Object="",projection:MonCache.Types.Object=""</FormalSpec>
+<ReturnType>%Library.ListOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+  s normalizedQuery = ##class(Query).build(query)
+
+  s documents = $$$collections.newList()
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s document = ..loadDocument(documentNode)
+
+    if (normalizedQuery.isSatisfied(document)) {
+      d ##class(Projection).project(document, projection)
+
+      d documents.Insert(document)
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  return documents
+]]></Implementation>
+</Method>
+
+<Method name="count">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,query:MonCache.Types.Object=""</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+  s documentsCount = 0
+
+  if (query = "") {
+    return ..collectionSize(db, collection)
+  }
+
+  s normalizedQuery = ##class(Query).build(query)
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s document = ..loadDocument(documentNode)
+
+    if (normalizedQuery.isSatisfied(document)) {
+      s documentsCount = $increment(documentsCount)
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  return documentsCount
+]]></Implementation>
+</Method>
+
+<Method name="findOne">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,query:MonCache.Types.Object="",projection:MonCache.Types.Object=""</FormalSpec>
+<ReturnType>MonCache.Types.Object</ReturnType>
+<Implementation><![CDATA[
+  s normalizedQuery = ##class(Query).build(query)
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s document = ..loadDocument(documentNode)
+
+    if (normalizedQuery.isSatisfied(document)) {
+      d ##class(Projection).project(document, projection)
+
+      return document
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  return ""
+]]></Implementation>
+</Method>
+
+<Method name="loadDocument">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>documentNode:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>MonCache.Types.Object</ReturnType>
+<Implementation><![CDATA[
+  s document = $$$object
+
+  s documentFieldName = $order(@documentNode@(""))
+
+  while (documentFieldName '= "") {
+    s documentFieldNode = $name(@documentNode@(documentFieldName))
+
+    s documentFieldValue = ##class(MonCache.Types.MonCacheType).fromGlobal(documentFieldNode)
+
+    if (documentFieldValue '= "") {
+      d document.set(documentFieldName, documentFieldValue)
+    }
+
+    s documentFieldName = $order(@documentFieldNode)
+  }
+
+  return document
+]]></Implementation>
+</Method>
+
+<Method name="update">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,query:MonCache.Types.Object,modifications:MonCache.Types.Object,parameters:MonCache.Types.Object=""</FormalSpec>
+<ReturnType>MonCache.DB.Result</ReturnType>
+<Implementation><![CDATA[
+  if (parameters = "") {
+    s parameters = $$$object
+  }
+
+  if (parameters.notContains("multi")) {
+    d parameters.set("multi", $$$false)
+  }
+
+  if (parameters.notContains("upsert")) {
+    d parameters.set("upsert", $$$false)
+  }
+
+  s normalizedQuery = ##class(Query).build(query)
+
+  s wasFoundDocument = $$$NO
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  s modifiedDocumentsCount = 0
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s document = ..loadDocument(documentNode)
+
+    if (normalizedQuery.isSatisfied(document)) {
+      s wasFoundDocument = $$$YES
+
+      if (modifications.isNotEmpty()) {
+        s modificationsOperators = modifications.getNames()
+
+        for i = 1:1:modificationsOperators.Count() {
+          s modificationOperatorName = modificationsOperators.GetAt(i)
+
+          s modificationOperator = modifications.get(modificationOperatorName)
+
+          if (modificationOperator.isObject() && modificationOperator.isNotEmpty()) {
+            s fieldsNames = ##class(MonCache.Types.Object) modificationOperator.getNames()
+
+            if (modificationOperatorName = "$set") {
+              for j = 1:1:fieldsNames.Count() {
+                s fieldName = fieldsNames.GetAt(j)
+
+                s fieldValue = modificationOperator.get(fieldName)
+
+                d document.set(fieldName, fieldValue)
+              }
+            }
+            elseif (modificationOperatorName = "$unset") {
+              for j = 1:1:fieldsNames.Count() {
+                s fieldName = fieldsNames.GetAt(j)
+
+                if (document.contains(fieldName)) {
+                  d document.remove(fieldName)
+                }
+              }
+            }
+            elseif (modificationOperatorName = "$rename") {
+              for j = 1:1:fieldsNames.Count() {
+                s fieldName = fieldsNames.GetAt(j)
+
+                s fieldNewName = modificationOperator.get(fieldName)
+
+                if (fieldNewName.isString()) {
+                  s fieldNewName = fieldNewName.getValue()
+
+                  if ((fieldName '= fieldNewName) && (fieldNewName '= "") && document.contains(fieldName) && document.notContains(fieldNewName)) {
+                    s fieldValue = document.get(fieldName)
+
+                    d document.remove(fieldName)
+
+                    d document.set(fieldNewName, fieldValue)
+                  }
+                }
+              }
+            }
+            elseif (modificationOperatorName = "$inc") {
+              for j = 1:1:fieldsNames.Count() {
+                s fieldName = fieldsNames.GetAt(j)
+
+                s fieldIncrementor = modificationOperator.get(fieldName)
+
+                if (fieldIncrementor.isNumber()) {
+                  s fieldIncrementor = fieldIncrementor.getValue()
+
+                  if (document.contains(fieldName) && document.get(fieldName).isNumber()) {
+                    s fieldValue = document.get(fieldName)
+
+                    d document.setNumber(fieldName, fieldValue.getValue() + fieldIncrementor)
+                  }
+                }
+              }
+            }
+            elseif (modificationOperatorName = "$mul") {
+              for j = 1:1:fieldsNames.Count() {
+                s fieldName = fieldsNames.GetAt(j)
+
+                s fieldMultiplicator = modificationOperator.get(fieldName)
+
+                if (fieldMultiplicator.isNumber()) {
+                  s fieldMultiplicator = fieldMultiplicator.getValue()
+
+                  if (document.contains(fieldName) && document.get(fieldName).isNumber()) {
+                    s fieldValue = document.get(fieldName)
+
+                    d document.setNumber(fieldName, fieldValue.getValue() * fieldMultiplicator)
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        d ..persist(db, collection, documentId, document)
+
+        s modifiedDocumentsCount = $increment(modifiedDocumentsCount)
+      }
+
+      if (($$$false).equals(parameters.get("multi"))) {
+        return ##class(MonCache.DB.Result).%New(0, modifiedDocumentsCount, 0)
+      }
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  if ('wasFoundDocument && ($$$true).equals(parameters.get("upsert"))) {
+    d ..save(db, collection, query)
+
+    return ##class(MonCache.DB.Result).%New(1, 0, 0)
+  }
+
+  return ##class(MonCache.DB.Result).%New(0, modifiedDocumentsCount, 0)
+]]></Implementation>
+</Method>
+
+<Method name="remove">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>db:%String,collection:%String,query:MonCache.Types.Object="",parameters:MonCache.Types.Object=""</FormalSpec>
+<ReturnType>MonCache.DB.Result</ReturnType>
+<Implementation><![CDATA[
+  if (parameters = "") {
+    s parameters = ##class(MonCache.Types.Object).%New()
+  }
+
+  if (parameters.notContains("justOne")) {
+    d parameters.set("justOne", $$$false)
+  }
+
+  s isSingleDocumentMode = parameters.get("justOne").equals($$$true)
+
+  s normalizedQuery = ##class(Query).build(query)
+
+  s collectionNode = $name(^MonCache(db, collection))
+
+  s documentId = $order(@collectionNode@(""))
+
+  s removedDocumentsCount = 0
+
+  while (documentId '= "") {
+    s documentNode = $name(@collectionNode@(documentId))
+
+    s document = ..loadDocument(documentNode)
+
+    if (normalizedQuery.isSatisfied(document)) {
+      k @documentNode
+
+      s removedDocumentsCount = $increment(removedDocumentsCount)
+
+      if (isSingleDocumentMode) {
+        return ##class(MonCache.DB.Result).%New(0, 0, removedDocumentsCount)
+      }
+    }
+
+    s documentId = $order(@documentNode)
+  }
+
+  return ##class(MonCache.DB.Result).%New(0, 0, removedDocumentsCount)
+]]></Implementation>
+</Method>
+</Class>
+</Export>
