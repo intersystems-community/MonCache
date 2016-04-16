@@ -14,7 +14,7 @@
 
 <Method name="isNotValidNumber">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>nuberString:%String</FormalSpec>
+<FormalSpec>numberString:%String</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[    return '..isValidNumber(numberString)
 ]]></Implementation>
